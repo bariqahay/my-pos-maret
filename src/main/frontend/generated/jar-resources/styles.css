@@ -1,12 +1,85 @@
-/* Common styles for both views */
-.login-view, .signup-view {
-    background-image: url('/frontend/images/background.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 100vh;
+.dashboard-view {
+    width: 100%;
+    padding: 0;
+    /* background diilangin */
 }
 
+.dashboard-title {
+    color: #2c3e50;
+    font-weight: bold;
+    margin: 20px;
+}
+
+.input-section {
+    gap: 10px;
+    align-items: end;
+    margin: 0 20px 20px 20px;
+}
+
+.cart-grid {
+    height: 250px;
+    margin: 0 20px 20px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+}
+
+.total-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 20px 10px 20px;
+}
+
+.bayar-section {
+    gap: 10px;
+    align-items: end;
+    margin: 0 20px 10px 20px;
+}
+
+.kembalian-text {
+    font-size: 16px;
+    font-style: italic;
+    color: #27ae60;
+    margin: 0 20px;
+}
+
+
+
+/* styles.css */
+html, body {
+    height: 100%;
+    margin: 0;
+    background: linear-gradient(135deg, #A8E6CF, #FFD3B6);
+}
+
+.sidebar-user {
+    align-items: center;
+    text-align: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.router-link-active {
+    background-color: #e0f2f1;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+vaadin-app-layout::part(drawer) {
+    background-color: #fafafa;
+}
+
+vaadin-app-layout::part(navbar) {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+vaadin-app-layout {
+    font-family: 'Poppins', sans-serif;
+}
+
+/**/
 .login-card, .signup-card  {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 16px;

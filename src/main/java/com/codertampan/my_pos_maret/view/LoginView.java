@@ -1,6 +1,8 @@
 package com.codertampan.my_pos_maret.view;
 
+import com.codertampan.my_pos_maret.entity.User;
 import com.codertampan.my_pos_maret.service.UserService;
+import com.codertampan.my_pos_maret.service.UserSession;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -17,15 +19,17 @@ import com.vaadin.flow.router.Route;
 public class LoginView extends VerticalLayout {
 
     private final UserService userService;
+    private final UserSession userSession;
+
 
     private TextField username = new TextField("Username");
     private PasswordField password = new PasswordField("Password");
     private Button loginButton = new Button("Login");
     private Button signupButton = new Button("Don't have an account? Sign up!");
 
-    public LoginView(UserService userService) {
+    public LoginView(UserService userService, UserSession userSession) {
         this.userService = userService;
-
+        this.userSession = userSession;
         // Main container styling
         addClassName("login-view");
         setSizeFull();
@@ -65,8 +69,11 @@ public class LoginView extends VerticalLayout {
         
             boolean isAuthenticated = userService.validateLogin(enteredUsername, enteredPassword);
             if (isAuthenticated) {
+                User user = userService.getUserByUsername(enteredUsername);
+                userSession.setUser(user); // 🔥 ini yang simpen ke session
                 getUI().ifPresent(ui -> ui.navigate("dashboard"));
-            } else {
+            }
+            else {
                 username.setInvalid(true);
                 password.setInvalid(true);
                 username.setErrorMessage("Invalid username or password");
