@@ -114,6 +114,6 @@ public class MainLayout extends AppLayout {
 
     private void logout() {
         userSession.clear();
-        getUI().ifPresent(ui -> ui.navigate("login"));
+        getUI().ifPresent(ui -> ui.navigate(""));
     }
 }
