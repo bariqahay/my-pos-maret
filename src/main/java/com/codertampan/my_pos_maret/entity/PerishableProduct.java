@@ -1,13 +1,16 @@
 package com.codertampan.my_pos_maret.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+
 import java.time.LocalDate;
 
 @Entity
 @DiscriminatorValue("perishable")
 public class PerishableProduct extends Product {
 
+    @Column(name = "expiry_date") // <-- ini penting
     private LocalDate expiryDate;
 
     public PerishableProduct() {

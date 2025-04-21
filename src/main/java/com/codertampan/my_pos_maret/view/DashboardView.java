@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.PageTitle;
@@ -25,7 +26,7 @@ import java.util.List;
 @Route(value = "dashboard", layout = MainLayout.class)
 @PageTitle("Dashboard")
 @CssImport("./styles.css")
-public class DashboardView extends SecureView {
+public class DashboardView extends VerticalLayout {
 
     private final ProductService productService;
     private final List<CartItem> cart = new ArrayList<>();

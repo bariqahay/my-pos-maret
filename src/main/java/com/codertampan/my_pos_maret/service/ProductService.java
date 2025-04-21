@@ -15,96 +15,51 @@ import java.util.Optional;
 @Service
 public class ProductService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class); // Logger for warning if product is not found
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private ProductRepository productRepository;
 
-    /**
-     * Mencari produk berdasarkan kode
-     * @param code Kode produk
-     * @return Produk yang ditemukan atau null jika tidak ditemukan
-     */
-    public Product findByCode(String code) {
-        // Memastikan kode tidak null atau kosong
-        if (!StringUtils.hasText(code)) {
-            logger.warn("Product code is empty or invalid.");
-            return null;
-        }
-
-        // Mencari produk berdasarkan kode
-        Product product = productRepository.findByCode(code.trim());
-        if (product == null) {
-            logger.warn("Product with code '{}' not found.", code);
-        }
-        return product;
-    }
-
-    /**
-     * Mengupdate informasi produk di database
-     * @param product Produk yang akan diupdate
-     */
-    public void updateProduct(Product product) {
-        if (product == null || product.getId() == null) {
-            logger.error("Product or product ID is null. Cannot update.");
-            return;
-        }
-
-        try {
-            if (product instanceof Stokable) {
-                // Mungkin lakukan logika khusus untuk Stokable jika perlu
-                logger.info("Product is stokable: " + product.getName());
-            }
-
-            productRepository.save(product);  // Save the product or stokable product
-            logger.info("Product with ID '{}' updated successfully.", product.getId());
-        } catch (Exception e) {
-            logger.error("Failed to update product with ID '{}'. Error: {}", product.getId(), e.getMessage());
-        }
-    }
-
-    /**
-     * Mendapatkan semua produk yang ada di database
-     * @return Daftar semua produk
-     */
+    // Method to fetch all products
     public List<Product> getAllProducts() {
         try {
-            return productRepository.findAll();  // Mengambil semua produk dari database
+            return productRepository.findAll();  // Returns all products
         } catch (Exception e) {
             logger.error("Error fetching all products: {}", e.getMessage());
-            return List.of();  // Return empty list in case of error
+            return List.of();  // Return an empty list in case of error
         }
     }
 
-    /**
-     * Menyaring produk berdasarkan jenis
-     * @param type Kelas produk untuk filter (misalnya: NonPerishableProduct, DigitalProduct)
-     * @return Daftar produk sesuai jenis
-     */
-    public List<Product> getProductsByType(Class<? extends Product> type) {
+    public void deleteProduct(Product product) {
+        if (product == null || product.getId() == null) {
+            logger.error("Product or product ID is null. Cannot delete.");
+            return;
+        }
         try {
-            return productRepository.findByType(type);
+            productRepository.delete(product);
+            logger.info("Product with ID '{}' deleted successfully.", product.getId());
         } catch (Exception e) {
-            logger.error("Error fetching products by type {}: {}", type.getSimpleName(), e.getMessage());
-            return List.of();  // Return empty list in case of error
+            logger.error("Failed to delete product with ID '{}'. Error: {}", product.getId(), e.getMessage());
         }
     }
 
-    /**
-     * Menyaring produk berdasarkan kode yang valid
-     * @param code Kode produk
-     * @return Optional Produk (lebih aman jika produk tidak ditemukan)
-     */
-    public Optional<Product> findByCodeOptional(String code) {
-        if (!StringUtils.hasText(code)) {
-            logger.warn("Product code is empty or invalid.");
-            return Optional.empty();
-        }
-        
-        Product product = productRepository.findByCode(code.trim());
+    public void saveProduct(Product product) {
         if (product == null) {
-            logger.warn("Product with code '{}' not found.", code);
+            logger.warn("Product is null. Cannot save.");
+            return;
         }
-        return Optional.ofNullable(product);
+        try {
+            productRepository.save(product);
+            logger.info("Product with code '{}' saved successfully.", product.getCode());
+        } catch (Exception e) {
+            logger.error("Failed to save product with code '{}'. Error: {}", product.getCode(), e.getMessage());
+        }
     }
+
+    public Product getProductById(long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        return optionalProduct.orElse(null);
+    }
+    
+    // Other methods like updateProduct(), findByCode(), etc.
 }
