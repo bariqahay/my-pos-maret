@@ -36,7 +36,6 @@ public class AddProductView extends VerticalLayout {
     private final DatePicker expiryDatePicker = new DatePicker("Tanggal Kadaluarsa");
     private final ComboBox<String> typeField = new ComboBox<>("Tipe Produk");
 
-
     @Autowired
     public AddProductView(ProductService productService) {
         this.productService = productService;
@@ -84,33 +83,28 @@ public class AddProductView extends VerticalLayout {
         Product product; // <- Ini deklarasi di luar blok if/else
     
         //"Perishable", "Non-Perishable", "Digital", "Bundle"
-        if (tipe=="Perishable") {
+        if (tipe.equals("Perishable")) {
             if (expiryDate == null) {
                 Notification.show("Tanggal kadaluarsa wajib diisi untuk produk perishable!");
                 return;
             }
-            PerishableProduct perishable = new PerishableProduct();
-            perishable.setName(name);
-            perishable.setCode(code);
-            perishable.setPrice(price);
-            perishable.setStock(stock.intValue());
-            perishable.setexpiryDate(expiryDate);
+            PerishableProduct perishable = new PerishableProduct(code, name, price, stock.intValue(), expiryDate);
             product = perishable;
-        } else if (tipe=="Non-Perishable") {
+        } else if (tipe.equals("Non-Perishable")) {
             NonPerishableProduct nonPerishable = new NonPerishableProduct();
             nonPerishable.setName(name);
             nonPerishable.setCode(code);
             nonPerishable.setPrice(price);
             nonPerishable.setStock(stock.intValue());
             product = nonPerishable;
-        } else if (tipe=="Digital") {
+        } else if (tipe.equals("Digital")) {
             DigitalProduct digital = new DigitalProduct();
             digital.setName(name);
             digital.setCode(code);
             digital.setPrice(price);
             digital.setStock(stock.intValue());
             product = digital;
-        } else if (tipe=="Bundle") {
+        } else if (tipe.equals("Bundle")) {
             BundleProduct bundle = new BundleProduct();
             bundle.setName(name);
             bundle.setCode(code);
@@ -137,5 +131,4 @@ public class AddProductView extends VerticalLayout {
             Notification.show("Gagal menyimpan produk: " + e.getMessage());
         }
     }
-    
 }

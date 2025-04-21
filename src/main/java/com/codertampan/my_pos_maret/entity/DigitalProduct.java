@@ -12,11 +12,11 @@ public class DigitalProduct extends Product {
     private String vendorName;
 
     public DigitalProduct() {
-        // Default constructor for Hibernate
+        super(null, null, 0.0, 0);  // Call the Product constructor with default values
     }
 
     public DigitalProduct(String code, String name, double price, URL url, String vendorName) {
-        super(code, name, price);
+        super(code, name, price, 0);  // Default stock as 0
         this.url = url;
         this.vendorName = vendorName;
     }
@@ -35,5 +35,10 @@ public class DigitalProduct extends Product {
 
     public void setVendorName(String vendorName) {
         this.vendorName = vendorName;
+    }
+
+    @Override
+    public double getDiscountedPrice() {
+        return getPrice(); // No discount for digital products in this example
     }
 }

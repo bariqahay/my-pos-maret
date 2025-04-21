@@ -3,6 +3,7 @@ package com.codertampan.my_pos_maret.view;
 import com.codertampan.my_pos_maret.entity.User;
 import com.codertampan.my_pos_maret.entity.UserRole;
 import com.codertampan.my_pos_maret.service.UserService;
+import com.codertampan.my_pos_maret.service.UserSession;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
@@ -25,6 +26,7 @@ import java.util.List;
 public class AdminUserManagementView extends VerticalLayout {
 
     private final UserService userService;
+    private final UserSession userSession;
 
     private Grid<User> userGrid = new Grid<>(User.class);
     private TextField usernameField = new TextField("Username");
@@ -37,9 +39,11 @@ public class AdminUserManagementView extends VerticalLayout {
     private User selectedUser;
 
     @Autowired
-    public AdminUserManagementView(UserService userService) {
+    public AdminUserManagementView(UserService userService, UserSession userSession) {
         this.userService = userService;
+        this.userSession = userSession;
 
+        // Check if current user is admin; otherwise, restrict access
         if (!currentUserIsAdmin()) {
             add(new Paragraph("❌ Akses ditolak. Hanya admin yang dapat mengakses halaman ini."));
             return;
@@ -131,6 +135,8 @@ public class AdminUserManagementView extends VerticalLayout {
     }
 
     private boolean currentUserIsAdmin() {
-        return true;
+        // Using the userSession to check if the logged-in user is an admin
+        User currentUser = userSession.getUser();
+        return currentUser != null && currentUser.getRole() == UserRole.ADMIN;
     }
 }

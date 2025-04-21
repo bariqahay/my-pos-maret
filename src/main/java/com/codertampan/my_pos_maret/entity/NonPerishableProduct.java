@@ -8,27 +8,33 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("nonperishable")
 public class NonPerishableProduct extends Product implements Stokable {
 
-    @Column(nullable = false)  // Pastikan stock ada di DB
-    private int stock;
+    @Column(nullable = false)  // Ensure stock is persisted
+    private Integer stock;
 
-    // Getter untuk stock
+    public NonPerishableProduct() {
+        super(null, null, 0.0, 0);  // Default constructor for Hibernate
+    }
+
     @Override
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 
-    // Setter untuk stock
     @Override
-    public void setStock(int newStock) {
+    public void setStock(Integer newStock) {
         this.stock = newStock;
     }
 
-    // Implementasi reduceStock dari Stokable interface
     @Override
     public void reduceStock(int qty) {
         if (qty > stock) {
-            throw new IllegalArgumentException("Stok tidak mencukupi untuk produk: " + getName());  // Pastikan getName() ada di class Product
+            throw new IllegalArgumentException("Stok tidak mencukupi untuk produk: " + getName());
         }
         this.stock -= qty;
+    }
+
+    @Override
+    public double getDiscountedPrice() {
+        return getPrice(); // No discount for non-perishable products in this example
     }
 }
