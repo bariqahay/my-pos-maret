@@ -83,13 +83,20 @@ public class MainLayout extends AppLayout {
             .set("padding", "0.75rem 1rem")
             .set("border-radius", "8px");
 
+        RouterLink productListLink = new RouterLink("🏠 Product List", ProductListView.class);
+        productListLink.getStyle()
+            .set("text-decoration", "none")
+            .set("color", "#333")
+            .set("padding", "0.75rem 1rem")
+            .set("border-radius", "8px");
 
-                RouterLink ProductlistLink = new RouterLink("🏠 Product List", ProductListView.class);
-                ProductlistLink.getStyle()
-                    .set("text-decoration", "none")
-                    .set("color", "#333")
-                    .set("padding", "0.75rem 1rem")
-                    .set("border-radius", "8px");
+        // Add "User Management" link for admins
+        RouterLink userManagementLink = new RouterLink("👥 User Management", AdminUserManagementView.class);
+        userManagementLink.getStyle()
+            .set("text-decoration", "none")
+            .set("color", "#333")
+            .set("padding", "0.75rem 1rem")
+            .set("border-radius", "8px");
 
         // Tombol logout
         Button logoutButton = new Button("Logout", e -> logout());
@@ -101,7 +108,7 @@ public class MainLayout extends AppLayout {
             .set("border-radius", "8px");
 
         // Menambahkannya ke layout menu
-        VerticalLayout menuLayout = new VerticalLayout(dashboardLink, ProductlistLink, logoutButton);
+        VerticalLayout menuLayout = new VerticalLayout(dashboardLink, productListLink, userManagementLink, logoutButton);
         menuLayout.setPadding(true);
         menuLayout.setSpacing(false);
 
@@ -122,5 +129,4 @@ public class MainLayout extends AppLayout {
         // Redirect ke halaman login
         getUI().ifPresent(ui -> ui.navigate(""));
     }
-
 }

@@ -12,29 +12,45 @@ public class BundleProduct extends Product {
     @OneToMany
     private List<Product> items;
 
-    // Konstruktor default untuk Hibernate
+    // Default constructor for Hibernate
     public BundleProduct() {
+        super(null, null, 0.0, 0);  // Default values
     }
 
-    // Konstruktor dengan parameter
+    // Parameterized constructor
     public BundleProduct(String code, String name, double price, List<Product> items) {
-        super(code, name, price);  // Panggil konstruktor dari Product
+        super(code, name, price, 0);  // Default stock as 0, since it's a bundle
         this.items = items;
     }
 
+    // Method to calculate the discounted price for the bundle
+    @Override
     public double getDiscountedPrice() {
         double total = 0;
+        // Calculate the total price of all items in the bundle
         for (Product p : items) {
             total += p.getPrice();
         }
-        return total * 0.9; // Contoh diskon 10%
+        return total * 0.9;  // Example discount of 10%
     }
 
+    // Getter for the items in the bundle
     public List<Product> getItems() {
         return items;
     }
 
+    // Setter for the items in the bundle
     public void setItems(List<Product> items) {
         this.items = items;
+    }
+
+    @Override
+    public String toString() {
+        return "BundleProduct{" +
+                "code='" + getCode() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", price=" + getPrice() +
+                ", items=" + items +
+                '}';
     }
 }
