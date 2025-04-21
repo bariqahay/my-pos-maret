@@ -84,7 +84,7 @@ public class AddProductView extends VerticalLayout {
         Product product; // <- Ini deklarasi di luar blok if/else
     
         //"Perishable", "Non-Perishable", "Digital", "Bundle"
-        if (tipe.equals("Perishable")) {
+        if (tipe=="Perishable") {
             if (expiryDate == null) {
                 Notification.show("Tanggal kadaluarsa wajib diisi untuk produk perishable!");
                 return;
@@ -94,23 +94,23 @@ public class AddProductView extends VerticalLayout {
             perishable.setCode(code);
             perishable.setPrice(price);
             perishable.setStock(stock.intValue());
-            perishable.setExpiryDate(expiryDate);
+            perishable.setexpiryDate(expiryDate);
             product = perishable;
-        } else if (tipe.equals("Non-Perishable")) {
+        } else if (tipe=="Non-Perishable") {
             NonPerishableProduct nonPerishable = new NonPerishableProduct();
             nonPerishable.setName(name);
             nonPerishable.setCode(code);
             nonPerishable.setPrice(price);
             nonPerishable.setStock(stock.intValue());
             product = nonPerishable;
-        } else if (tipe.equals("Digital")) {
+        } else if (tipe=="Digital") {
             DigitalProduct digital = new DigitalProduct();
             digital.setName(name);
             digital.setCode(code);
             digital.setPrice(price);
             digital.setStock(stock.intValue());
             product = digital;
-        } else if (tipe.equals("Bundle")) {
+        } else if (tipe=="Bundle") {
             BundleProduct bundle = new BundleProduct();
             bundle.setName(name);
             bundle.setCode(code);

@@ -5,22 +5,6 @@ import { injectGlobalCss } from 'Frontend/generated/jar-resources/theme-util.js'
 import { css, unsafeCSS, registerStyles } from '@vaadin/vaadin-themable-mixin';
 import $cssFromFile_0 from 'Frontend/generated/jar-resources/styles.css?inline';
 import '@vaadin/polymer-legacy-adapter/style-modules.js';
-<<<<<<< HEAD
-import '@vaadin/vertical-layout/theme/lumo/vaadin-vertical-layout.js';
-import '@vaadin/app-layout/theme/lumo/vaadin-app-layout.js';
-import '@vaadin/field-highlighter/theme/lumo/vaadin-field-highlighter.js';
-import '@vaadin/common-frontend/ConnectionIndicator.js';
-import '@vaadin/accordion/theme/lumo/vaadin-accordion.js';
-import '@vaadin/details/theme/lumo/vaadin-details.js';
-import '@vaadin/accordion/theme/lumo/vaadin-accordion-panel.js';
-import '@vaadin/button/theme/lumo/vaadin-button.js';
-import '@vaadin/app-layout/theme/lumo/vaadin-drawer-toggle.js';
-import '@vaadin/avatar/theme/lumo/vaadin-avatar.js';
-import '@vaadin/avatar-group/theme/lumo/vaadin-avatar-group.js';
-import '@vaadin/checkbox/theme/lumo/vaadin-checkbox.js';
-import '@vaadin/checkbox-group/theme/lumo/vaadin-checkbox-group.js';
-import '@vaadin/combo-box/theme/lumo/vaadin-combo-box.js';
-=======
 import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/app-layout/src/vaadin-app-layout.js';
 import '@vaadin/field-highlighter/src/vaadin-field-highlighter.js';
@@ -35,7 +19,6 @@ import '@vaadin/avatar-group/src/vaadin-avatar-group.js';
 import '@vaadin/checkbox/src/vaadin-checkbox.js';
 import '@vaadin/checkbox-group/src/vaadin-checkbox-group.js';
 import '@vaadin/combo-box/src/vaadin-combo-box.js';
->>>>>>> fitur-edit-bos
 import 'Frontend/generated/jar-resources/flow-component-renderer.js';
 import 'Frontend/generated/jar-resources/comboBoxConnector.js';
 import '@vaadin/multi-select-combo-box/src/vaadin-multi-select-combo-box.js';

@@ -2,6 +2,9 @@ package com.codertampan.my_pos_maret.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
+
+import org.springframework.cglib.core.Local;
 
 @Entity
 @Table(name = "products")
@@ -17,7 +20,7 @@ public class Product implements Serializable {
     private String name;
     private double price;
     private Integer stock;
-    private String expiryDate;
+    private LocalDate expiryDate;
 
     // Tidak perlu field type lagi karena ini akan selalu "perishable"
     @Column(name = "type", insertable = false, updatable = false)
@@ -26,7 +29,7 @@ public class Product implements Serializable {
     public Product() {
     }
 
-    public Product(String code, String name, double price, Integer stock, String expiryDate) {
+    public Product(String code, String name, double price, Integer stock, LocalDate expiryDate) {
         this.code = code;
         this.name = name;
         this.price = price;
@@ -48,8 +51,8 @@ public class Product implements Serializable {
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
 
-    public String getexpiryDate() { return expiryDate; }
-    public void setexpiryDate(String expiry_date) { this.expiryDate = expiryDate; }
+    public LocalDate getexpiryDate() { return expiryDate; }
+    public void setexpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
 
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
