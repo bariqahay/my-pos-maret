@@ -2,6 +2,7 @@ package com.codertampan.my_pos_maret.view;
 
 import com.codertampan.my_pos_maret.entity.User;
 import com.codertampan.my_pos_maret.service.UserSession;
+import com.codertampan.my_pos_maret.view.AdminUserManagementView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
@@ -54,63 +55,53 @@ public class MainLayout extends AppLayout {
     }
 
     private void createDrawer() {
-        // Ambil user dari session
         User currentUser = userSession.getUser();
-
-        // Kalau user belum login, pake info default (misalnya Guest)
+    
         String usernameText = currentUser != null ? currentUser.getUsername() : "Guest";
         String roleText = currentUser != null ? currentUser.getRole().toString() : "Guest";
-
-        // Avatar, username, dan role
+    
         Avatar avatar = new Avatar(usernameText);
         H4 username = new H4(usernameText);
         Span role = new Span(roleText);
-
+    
         username.getStyle().set("margin", "0");
         role.getStyle().set("font-size", "0.85rem").set("color", "gray");
-
+    
         VerticalLayout userInfo = new VerticalLayout(avatar, username, role);
         userInfo.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         userInfo.setPadding(false);
         userInfo.setSpacing(false);
         userInfo.getStyle().set("padding", "1rem 0");
-
-        // Menu links
+    
+        // Menu Links
         RouterLink dashboardLink = new RouterLink("🏠 Dashboard", DashboardView.class);
-        dashboardLink.getStyle()
-            .set("text-decoration", "none")
-            .set("color", "#333")
-            .set("padding", "0.75rem 1rem")
-            .set("border-radius", "8px");
-
-
-                RouterLink ProductlistLink = new RouterLink("🏠 Product List", ProductListView.class);
-                ProductlistLink.getStyle()
-                    .set("text-decoration", "none")
-                    .set("color", "#333")
-                    .set("padding", "0.75rem 1rem")
-                    .set("border-radius", "8px");
-
-        // Tombol logout
+        dashboardLink.getStyle().set("padding", "0.75rem 1rem");
+    
+        // Bikin layout menu
+        VerticalLayout menuLayout = new VerticalLayout(dashboardLink);
+    
+        // Kondisional: Tambah Manajemen User kalau role ADMIN
+        if (currentUser != null && "ADMIN".equalsIgnoreCase(currentUser.getRole().toString())) {
+            RouterLink userManagementLink = new RouterLink("👥 Manajemen User", AdminUserManagementView.class);
+            RouterLink productListLink = new RouterLink("📦 Product List", ProductListView.class);
+            userManagementLink.getStyle().set("padding", "0.75rem 1rem");
+            productListLink.getStyle().set("padding", "0.75rem 1rem");
+            menuLayout.add(productListLink,userManagementLink);
+        }
+    
+        // Logout button
         Button logoutButton = new Button("Logout", e -> logout());
-
         logoutButton.getStyle()
-            .set("text-decoration", "none")
             .set("color", "red")
-            .set("padding", "0.75rem 1rem")
-            .set("border-radius", "8px");
-
-        // Menambahkannya ke layout menu
-        VerticalLayout menuLayout = new VerticalLayout(dashboardLink, ProductlistLink, logoutButton);
-        menuLayout.setPadding(true);
-        menuLayout.setSpacing(false);
-
-        // Layout drawer
+            .set("padding", "0.75rem 1rem");
+    
+        menuLayout.add(logoutButton);
+    
         VerticalLayout drawerContent = new VerticalLayout(userInfo, menuLayout);
         drawerContent.setPadding(false);
         drawerContent.setSpacing(false);
         drawerContent.getStyle().set("background-color", "#f7f7f7");
-
+    
         addToDrawer(drawerContent);
     }
 
