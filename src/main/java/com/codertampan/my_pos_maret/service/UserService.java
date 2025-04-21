@@ -59,6 +59,10 @@ public class UserService {
         return true;
     }
 
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+    
     // Optional: still provide raw save for internal purposes (but NEVER call this directly from UI)
     public void saveUser(User user) {
         if (user.getCreatedAt() == null) {
