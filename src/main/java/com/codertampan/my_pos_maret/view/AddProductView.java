@@ -34,6 +34,8 @@ public class AddProductView extends VerticalLayout {
     private final NumberField priceField = new NumberField("Harga");
     private final NumberField stockField = new NumberField("Stok");
     private final DatePicker expiryDatePicker = new DatePicker("Tanggal Kadaluarsa");
+    private final TextField vendorField = new TextField("Vendor Produk");
+    private final TextField urlField = new TextField("Url Produk");
     private final ComboBox<String> typeField = new ComboBox<>("Tipe Produk");
 
     @Autowired
@@ -53,12 +55,14 @@ public class AddProductView extends VerticalLayout {
         priceField.setPlaceholder("Harga per item");
         stockField.setPlaceholder("Jumlah stok");
         expiryDatePicker.setPlaceholder("yyyy-MM-dd");
+        vendorField.setPlaceholder("Nama Vendor");
+        urlField.setPlaceholder("Url Link");
 
         typeField.setItems("Perishable", "Non-Perishable", "Digital", "Bundle"); // Pilihan tipe produk manual
         typeField.setPlaceholder("Pilih tipe produk");
 
         HorizontalLayout formLayout = new HorizontalLayout(
-                nameField, codeField, priceField, stockField, expiryDatePicker, typeField
+                nameField, codeField, priceField, stockField, expiryDatePicker, typeField, vendorField, urlField
         );
         formLayout.setSpacing(true);
         add(formLayout);
@@ -74,6 +78,8 @@ public class AddProductView extends VerticalLayout {
         Double stock = stockField.getValue();
         LocalDate expiryDate = expiryDatePicker.getValue();
         String tipe = typeField.getValue();
+        String vendor = vendorField.getValue();
+        String urls = urlField.getValue();
     
         if (name.isEmpty() || code.isEmpty() || price == null || stock == null || tipe == null) {
             Notification.show("Semua field harus diisi!");
@@ -103,6 +109,8 @@ public class AddProductView extends VerticalLayout {
             digital.setCode(code);
             digital.setPrice(price);
             digital.setStock(stock.intValue());
+            digital.setVendor(vendor);
+            digital.setUrl(urls);
             product = digital;
         } else if (tipe.equals("Bundle")) {
             BundleProduct bundle = new BundleProduct();

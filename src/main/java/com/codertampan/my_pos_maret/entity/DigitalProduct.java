@@ -1,44 +1,67 @@
 package com.codertampan.my_pos_maret.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import java.net.URL;
 
 @Entity
 @DiscriminatorValue("digital")
 public class DigitalProduct extends Product {
 
-    private URL url;
-    private String vendorName;
+    @Column(nullable = false)
+    private String url = "-";
 
+    @Column(nullable = false)
+    private String vendor_name = "-";
+
+    // Default constructor for Hibernate
     public DigitalProduct() {
-        super(null, null, 0.0, 0);  // Call the Product constructor with default values
+        super.setStock(null); // enforce null stock
     }
 
-    public DigitalProduct(String code, String name, double price, URL url, String vendorName) {
-        super(code, name, price, 0);  // Default stock as 0
-        this.url = url;
-        this.vendorName = vendorName;
+    // Constructor with parameters
+    public DigitalProduct(String code, String name, double price) {
+        super(code, name, price, null); // force stock to null
+        this.url = "-";
+        this.vendor_name = "-";
     }
 
-    public URL getUrl() {
-        return url;
+    // Optional: Constructor with full parameters
+    public DigitalProduct(String code, String name, double price, String url, String vendor_name) {
+        super(code, name, price, null); // force stock to null
+        this.url = (url != null) ? url : "-";
+        this.vendor_name = (vendor_name != null) ? vendor_name : "-";
     }
 
-    public void setUrl(URL url) {
-        this.url = url;
+    @Override
+    public Integer getStock() {
+        return null; // digital product tidak punya stok
     }
 
-    public String getVendorName() {
-        return vendorName;
-    }
-
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
+    @Override
+    public void setStock(Integer newStock) {
+        super.setStock(null); // always enforce null
     }
 
     @Override
     public double getDiscountedPrice() {
-        return getPrice(); // No discount for digital products in this example
+        return getPrice();
+    }
+
+    // Getters and Setters for url and vendor
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = (url != null) ? url : "-";
+    }
+
+    public String getVendor() {
+        return vendor_name;
+    }
+
+    public void setVendor(String vendor_name) {
+        this.vendor_name = (vendor_name != null) ? vendor_name : "-";
     }
 }
