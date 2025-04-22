@@ -34,4 +34,4 @@ public class SalesLog {
 
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate = LocalDateTime.now(); // Ini akan memastikan default value    
-}
+
