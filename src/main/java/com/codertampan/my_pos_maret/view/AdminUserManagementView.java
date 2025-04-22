@@ -43,9 +43,10 @@ public class AdminUserManagementView extends VerticalLayout {
         this.userService = userService;
         this.userSession = userSession;
 
-        // Check if current user is admin; otherwise, restrict access
+        // Redirect jika bukan admin
         if (!currentUserIsAdmin()) {
-            add(new Paragraph("❌ Akses ditolak. Hanya admin yang dapat mengakses halaman ini."));
+            Notification.show("❌ Akses ditolak. Halaman ini hanya untuk admin.", 3000, Notification.Position.MIDDLE);
+            getUI().ifPresent(ui -> ui.navigate(DashboardView.class));
             return;
         }
 
@@ -135,7 +136,6 @@ public class AdminUserManagementView extends VerticalLayout {
     }
 
     private boolean currentUserIsAdmin() {
-        // Using the userSession to check if the logged-in user is an admin
         User currentUser = userSession.getUser();
         return currentUser != null && currentUser.getRole() == UserRole.ADMIN;
     }

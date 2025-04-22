@@ -2,17 +2,19 @@ package com.codertampan.my_pos_maret.view;
 
 import com.codertampan.my_pos_maret.entity.PerishableProduct;
 import com.codertampan.my_pos_maret.entity.Product;
+import com.codertampan.my_pos_maret.entity.User;
+import com.codertampan.my_pos_maret.entity.UserRole;
 import com.codertampan.my_pos_maret.service.ProductService;
+import com.codertampan.my_pos_maret.service.UserSession;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 @Route(value = "product-list", layout = MainLayout.class)
 @PageTitle("Product List | My POS")
@@ -21,8 +23,16 @@ public class ProductListView extends VerticalLayout {
     private final ProductService productService;
     private final Grid<Product> grid = new Grid<>(Product.class);
 
-    public ProductListView(ProductService productService) {
+    public ProductListView(ProductService productService, UserSession userSession) {
         this.productService = productService;
+
+        // Cek apakah user admin
+        User currentUser = userSession.getUser();
+        if (currentUser == null || currentUser.getRole() != UserRole.ADMIN) {
+            Notification.show("❌ Akses ditolak. Halaman ini hanya untuk admin.", 3000, Notification.Position.MIDDLE);
+            getUI().ifPresent(ui -> ui.navigate(DashboardView.class));
+            return;
+        }
 
         addClassName("product-list-view");
         setSizeFull();
@@ -47,21 +57,17 @@ public class ProductListView extends VerticalLayout {
     }
 
     private void configureGrid() {
-        // Set columns for displaying product data
         grid.setColumns("name", "productType", "code", "price", "stock");
 
-        // Dynamically add expiryDate column for PerishableProduct
         grid.addColumn(product -> {
             if (product instanceof PerishableProduct) {
                 return ((PerishableProduct) product).getExpiryDate();
             }
-            return null;  // No expiryDate for non-perishable products
+            return null;
         }).setHeader("Expiry Date");
 
-        // Set auto-width for all columns
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
-        // Add Edit and Delete buttons for each product row
         grid.addComponentColumn(product -> {
             Button editButton = new Button("Edit", e -> editProduct(product));
             Button deleteButton = new Button("Delete", e -> deleteProduct(product));
@@ -70,22 +76,18 @@ public class ProductListView extends VerticalLayout {
             return actionLayout;
         }).setHeader("Actions");
 
-        // Add Lumo row stripes variant for visual style
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
     }
 
     private void updateList() {
-        // Update the grid items by fetching the product list from the service
         grid.setItems(productService.getAllProducts());
     }
 
     private void editProduct(Product product) {
-        // Navigate to the product edit page
         getUI().ifPresent(ui -> ui.navigate("edit-product/" + product.getId()));
     }
 
     private void deleteProduct(Product product) {
-        // Delete the product and refresh the grid after deletion
         productService.deleteProduct(product);
         updateList();
         Notification.show("Produk berhasil dihapus");
