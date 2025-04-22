@@ -2,6 +2,8 @@ package com.codertampan.my_pos_maret.view;
 
 import com.codertampan.my_pos_maret.entity.Product;
 import com.codertampan.my_pos_maret.service.ProductService;
+import com.codertampan.my_pos_maret.service.ProductLogUpdate;
+import com.codertampan.my_pos_maret.service.UserSession;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EditProductView extends VerticalLayout implements BeforeEnterObserver {
 
     private final ProductService productService;
+    private final ProductLogUpdate productLogUpdate;
+    private final UserSession userSession;
 
     private TextField nameField = new TextField("Nama");
     private TextField codeField = new TextField("Kode");
@@ -31,8 +35,10 @@ public class EditProductView extends VerticalLayout implements BeforeEnterObserv
     private Long productId;
 
     @Autowired
-    public EditProductView(ProductService productService) {
+    public EditProductView(ProductService productService, ProductLogUpdate productLogUpdate, UserSession userSession) {
         this.productService = productService;
+        this.productLogUpdate = productLogUpdate;
+        this.userSession = userSession;
 
         setSpacing(true);
         setPadding(true);
@@ -74,10 +80,31 @@ public class EditProductView extends VerticalLayout implements BeforeEnterObserv
         if (productId != null) {
             Product product = productService.getProductById(productId);
             if (product != null) {
+                String oldName = product.getName();
+                String oldCode = product.getCode();
+                double oldPrice = product.getPrice();
+                int oldStock = product.getStock();
+
+                // Update produk
                 product.setName(nameField.getValue());
                 product.setCode(codeField.getValue());
                 product.setPrice(priceField.getValue());
                 product.setStock(stockField.getValue().intValue());
+
+                // Get the seller's username from the session
+                String sellerUsername = userSession.getUser().getUsername();
+
+                // Log perubahan
+                if (!oldName.equals(nameField.getValue())) {
+                    productLogUpdate.logProductUpdated(sellerUsername, oldCode, "name", oldName, nameField.getValue());
+                }
+                if (oldPrice != priceField.getValue()) {
+                    productLogUpdate.logProductUpdated(sellerUsername, oldCode, "price", String.valueOf(oldPrice), String.valueOf(priceField.getValue()));
+                }
+                if (oldStock != stockField.getValue().intValue()) {
+                    productLogUpdate.logProductUpdated(sellerUsername, oldCode, "stock", String.valueOf(oldStock), String.valueOf(stockField.getValue().intValue()));
+                }
+
                 productService.saveProduct(product);
                 Notification.show("Produk berhasil diperbarui");
             }

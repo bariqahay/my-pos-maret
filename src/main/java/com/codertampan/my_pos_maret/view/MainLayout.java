@@ -1,6 +1,10 @@
 package com.codertampan.my_pos_maret.view;
 
+import java.time.LocalDateTime;
+
+import com.codertampan.my_pos_maret.entity.AuthLog;
 import com.codertampan.my_pos_maret.entity.User;
+import com.codertampan.my_pos_maret.repository.AuthLogRepository;
 import com.codertampan.my_pos_maret.service.UserSession;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -15,9 +19,11 @@ import com.vaadin.flow.router.RouterLink;
 public class MainLayout extends AppLayout {
 
     private final UserSession userSession;
-
-    public MainLayout(UserSession userSession) {
+    private final AuthLogRepository authLogRepository;
+    
+    public MainLayout(UserSession userSession, AuthLogRepository authLogRepository) {
         this.userSession = userSession;
+        this.authLogRepository = authLogRepository;
         createHeader();
         createDrawer();
     }
@@ -123,7 +129,23 @@ public class MainLayout extends AppLayout {
 
     // Logika untuk logout
     private void logout() {
+        // Tambahin log saat user logout
+        User currentUser = userSession.getUser();
+        if (currentUser != null) {
+            AuthLog log = new AuthLog();
+            log.setUsername(currentUser.getUsername());
+            log.setAction("LOGOUT");
+            log.setTimestamp(LocalDateTime.now());
+            log.setIpAddress("127.0.0.1"); // Ambil dari request IP
+            log.setUserAgent("Unknown Device"); // Ambil dari request user-agent
+
+            authLogRepository.save(log);
+
+            System.out.println("[AUTH LOG] LOGOUT for " + currentUser.getUsername()); // Debug ke console
+        }
+
         userSession.clear();
         getUI().ifPresent(ui -> ui.navigate(""));
     }
+
 }
