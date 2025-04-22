@@ -124,7 +124,7 @@ public class AddProductView extends VerticalLayout {
             bundle.setName(name);
             bundle.setCode(code);
             bundle.setPrice(price);
-            bundle.setStock(stock.intValue());
+            //bundle.setStock(stock.intValue());
             product = bundle;
         } else {
             Notification.show("Tipe produk tidak dikenal!");
