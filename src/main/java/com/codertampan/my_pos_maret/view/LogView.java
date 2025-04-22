@@ -9,9 +9,12 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+// ✅ Tambahkan import MainLayout
+import com.codertampan.my_pos_maret.view.MainLayout;
+
 import java.util.List;
 
-@Route("logs")
+@Route(value = "logs", layout = MainLayout.class) // ✅ Set layout-nya ke MainLayout
 @PageTitle("Log View")
 public class LogView extends VerticalLayout {
 
@@ -20,19 +23,15 @@ public class LogView extends VerticalLayout {
     public LogView(LogService logService) {
         this.logService = logService;
 
-        // Ambil semua log dari service
         List<Object> logs = logService.getAllLogs();
 
-        // Layout untuk Grid dan memberi jarak
         VerticalLayout gridLayout = new VerticalLayout();
         gridLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        // Tampilannya Grid untuk nampilin log
         Grid<Object> logGrid = new Grid<>();
         logGrid.setItems(logs);
         logGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        
-        // Kolom untuk Timestamp
+
         logGrid.addColumn(log -> {
             if (log instanceof AuthLog) {
                 return ((AuthLog) log).getTimestamp().toString();
@@ -50,10 +49,8 @@ public class LogView extends VerticalLayout {
             return null;
         }).setHeader("Timestamp").setSortable(true).setWidth("150px");
 
-        // Kolom untuk Log Type
         logGrid.addColumn(log -> log.getClass().getSimpleName()).setHeader("Log Type").setSortable(true).setWidth("150px");
 
-        // Kolom untuk AuthLog Details
         logGrid.addColumn(log -> {
             if (log instanceof AuthLog) {
                 AuthLog authLog = (AuthLog) log;
@@ -62,7 +59,6 @@ public class LogView extends VerticalLayout {
             return null;
         }).setHeader("AuthLog Details");
 
-        // Kolom untuk ProductLog Details
         logGrid.addColumn(log -> {
             if (log instanceof ProductLog) {
                 ProductLog productLog = (ProductLog) log;
@@ -71,7 +67,6 @@ public class LogView extends VerticalLayout {
             return null;
         }).setHeader("ProductLog Details");
 
-        // Kolom untuk ProductUpdateLog Details
         logGrid.addColumn(log -> {
             if (log instanceof ProductUpdateLog) {
                 ProductUpdateLog productUpdateLog = (ProductUpdateLog) log;
@@ -81,7 +76,6 @@ public class LogView extends VerticalLayout {
             return null;
         }).setHeader("ProductUpdateLog Details");
 
-        // Kolom untuk SalesLog Details
         logGrid.addColumn(log -> {
             if (log instanceof SalesLog) {
                 SalesLog salesLog = (SalesLog) log;
@@ -90,7 +84,6 @@ public class LogView extends VerticalLayout {
             return null;
         }).setHeader("SalesLog Details");
 
-        // Kolom untuk TransactionItemLog Details
         logGrid.addColumn(log -> {
             if (log instanceof TransactionItemLog) {
                 TransactionItemLog transactionItemLog = (TransactionItemLog) log;
@@ -99,7 +92,6 @@ public class LogView extends VerticalLayout {
             return null;
         }).setHeader("TransactionItemLog Details");
 
-        // Kolom untuk TransactionModificationLog Details
         logGrid.addColumn(log -> {
             if (log instanceof TransactionModificationLog) {
                 TransactionModificationLog transactionModificationLog = (TransactionModificationLog) log;
@@ -108,7 +100,6 @@ public class LogView extends VerticalLayout {
             return null;
         }).setHeader("TransactionModificationLog Details");
 
-        // Adding Grid to Layout
         gridLayout.add(logGrid);
         add(gridLayout);
     }

@@ -7,36 +7,30 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("bundle")
 public class BundleProduct extends Product implements Stokable {
 
-    // Default constructor for Hibernate
     public BundleProduct() {
     }
 
-    // Constructor with parameters
-    public BundleProduct(String code, String name, double price, Integer stock) {
-        super(code, name, price, stock); // stock wajib diisi
+    public BundleProduct(String code, String name, double price) {
+        super(code, name, price, null); // stock dipaksa null
     }
 
     @Override
     public Integer getStock() {
-        return super.getStock();
+        return null; // Bundle tidak punya stock
     }
 
     @Override
     public void setStock(Integer newStock) {
-        super.setStock(newStock);
+        throw new UnsupportedOperationException("BundleProduct tidak mendukung stock.");
     }
 
     @Override
     public void reduceStock(int qty) {
-        if (qty > getStock()) {
-            throw new IllegalArgumentException("Stok tidak mencukupi untuk produk bundle: " + getName());
-        }
-        setStock(getStock() - qty);
+        throw new UnsupportedOperationException("BundleProduct tidak punya stock untuk dikurangi.");
     }
 
     @Override
     public double getDiscountedPrice() {
-        // Bundle product bisa dikasih diskon tetap, misalnya 15%
         return getPrice() * 0.85;
     }
 }
