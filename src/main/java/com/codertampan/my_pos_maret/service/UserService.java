@@ -1,7 +1,9 @@
 package com.codertampan.my_pos_maret.service;
 
+import com.codertampan.my_pos_maret.entity.AuthLog;
 import com.codertampan.my_pos_maret.entity.User;
 import com.codertampan.my_pos_maret.entity.UserRole;
+import com.codertampan.my_pos_maret.repository.AuthLogRepository;
 import com.codertampan.my_pos_maret.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,54 +19,72 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuthLogRepository authLogRepository;
+
     public boolean validateLogin(String username, String password) {
         User user = userRepository.findByUsername(username);
-
-        if (user == null) {
-            System.out.println("[LOGIN FAILED] User not found: " + username);
-            return false;
+    
+        boolean success = false;
+        String action = "LOGIN_FAILED";
+    
+        if (user != null && BCrypt.checkpw(password, user.getPasswordHash())) {
+            success = true;
+            action = "LOGIN_SUCCESS";
         }
+    
+        AuthLog log = new AuthLog();
+        log.setUsername(username);
+        log.setAction(action);
+        log.setTimestamp(LocalDateTime.now());
+        log.setIpAddress("127.0.0.1");
+        log.setUserAgent("Unknown Device");
 
-        boolean passwordMatch = BCrypt.checkpw(password, user.getPasswordHash());
-        if (!passwordMatch) {
-            System.out.println("[LOGIN FAILED] Invalid password for user: " + username);
-        }
-
-        return passwordMatch;
+        authLogRepository.save(log);
+    
+        return success;
     }
 
-    /**
-     * Create a new user with given role based on admin password.
-     * If adminPassword is correct ("haloadmin"), user will be ADMIN.
-     * Otherwise, default role is KASIR.
-     */
-    public boolean createUser(String username, String plainPassword, String adminPassword) {
+    public boolean createUser(String username, String password, String adminPassword) {
         if (userRepository.findByUsername(username) != null) {
-            System.out.println("[SIGNUP FAILED] Username already taken: " + username);
             return false;
         }
-
-        UserRole role = UserRole.KASIR;
-        if ("haloadmin".equals(adminPassword)) {
-            role = UserRole.ADMIN;
-        }
-
+    
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPasswordHash(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
-        newUser.setRole(role);
+        newUser.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
         newUser.setCreatedAt(LocalDateTime.now());
-
-        userRepository.save(newUser);
-        System.out.println("[SIGNUP SUCCESS] User created: " + username + " as " + role);
+    
+        if ("haloadmin".equals(adminPassword)) {
+            newUser.setRole(UserRole.ADMIN);
+        } else {
+            newUser.setRole(UserRole.KASIR);
+        }
+    
+        AuthLog log = new AuthLog();
+        log.setUsername(username);
+        log.setAction("SIGNUP_SUCCESS");
+        log.setTimestamp(LocalDateTime.now());
+        log.setIpAddress("127.0.0.1");
+        log.setUserAgent("Unknown Device");
+    
+        try {
+            userRepository.save(newUser);
+            authLogRepository.save(log);
+            System.out.println("✅ User & log saved successfully");
+        } catch (Exception e) {
+            System.out.println("❌ Error while saving user or log: " + e.getMessage());
+            throw e;
+        }
+    
         return true;
     }
+    
 
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-    
-    // Optional: still provide raw save for internal purposes (but NEVER call this directly from UI)
+
     public void saveUser(User user) {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());
@@ -75,8 +95,8 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-    
+
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
-    }    
+    }
 }
