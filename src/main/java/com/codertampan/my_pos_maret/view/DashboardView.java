@@ -1,11 +1,14 @@
 package com.codertampan.my_pos_maret.view;
 
 import com.codertampan.my_pos_maret.entity.Product;
-import com.codertampan.my_pos_maret.entity.Stokable;
 import com.codertampan.my_pos_maret.service.ProductService;
+import com.codertampan.my_pos_maret.service.SalesLogService;
+import com.codertampan.my_pos_maret.service.TransactionModificationLogService;
+import com.codertampan.my_pos_maret.service.TransactionItemLogService;
 import com.codertampan.my_pos_maret.transaction.CartItem;
 import com.codertampan.my_pos_maret.transaction.PurchaseTransaction;
 import com.codertampan.my_pos_maret.transaction.PurchaseTransaction.InsufficientStockException;
+import com.codertampan.my_pos_maret.service.UserSession;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -29,6 +32,11 @@ import java.util.List;
 public class DashboardView extends VerticalLayout {
 
     private final ProductService productService;
+    private final SalesLogService salesLogService;
+    private final UserSession userSession;
+    private final TransactionModificationLogService transactionModificationLogService;
+    private final TransactionItemLogService transactionItemLogService;
+
     private final List<CartItem> cart = new ArrayList<>();
     private double total = 0.0;
 
@@ -42,8 +50,12 @@ public class DashboardView extends VerticalLayout {
     private final Grid<CartItem> cartGrid = new Grid<>(CartItem.class);
 
     @Autowired
-    public DashboardView(ProductService productService) {
+    public DashboardView(ProductService productService, SalesLogService salesLogService, UserSession userSession, TransactionModificationLogService trxLogService, TransactionItemLogService itemLogService) {
         this.productService = productService;
+        this.salesLogService = salesLogService;
+        this.userSession = userSession;
+        this.transactionModificationLogService = trxLogService;
+        this.transactionItemLogService = itemLogService;
 
         addClassName("dashboard-view");
         setSpacing(true);
@@ -53,7 +65,6 @@ public class DashboardView extends VerticalLayout {
         title.addClassName("dashboard-title");
         add(title);
 
-        // Setup ComboBox for product code
         setupKodeField();
 
         HorizontalLayout inputLayout = new HorizontalLayout();
@@ -64,6 +75,25 @@ public class DashboardView extends VerticalLayout {
         add(inputLayout);
 
         setupCartGrid();
+
+        Button hapusItemBtn = new Button("Hapus Item dari Cart", e -> {
+            CartItem selected = cartGrid.asSingleSelect().getValue();
+            if (selected != null) {
+                cart.remove(selected);
+                refreshCart();
+
+                // Logging hapus item
+                String username = userSession.getUser().getUsername();
+                String dummyTrxId = "TRX-DRAFT-" + System.currentTimeMillis();
+                String itemCode = selected.getProduct().getCode();
+                transactionModificationLogService.log(dummyTrxId, username, "REMOVE_ITEM", itemCode);
+
+                Notification.show("Item " + itemCode + " dihapus dan dicatat ke log.");
+            } else {
+                Notification.show("Pilih item dulu sebelum hapus.");
+            }
+        });
+        add(hapusItemBtn);
 
         totalText.addClassName("total-text");
         add(totalText);
@@ -82,10 +112,10 @@ public class DashboardView extends VerticalLayout {
         kodeField.setLabel("Kode Barang");
         kodeField.setItemLabelGenerator(Product::getCode);
         List<Product> products = productService.getAllProducts();
-        
+
         if (products == null || products.isEmpty()) {
             Notification.show("No products available.");
-            kodeField.setEnabled(false);  // Disable ComboBox if no products
+            kodeField.setEnabled(false);
         } else {
             kodeField.setItems(products);
         }
@@ -132,22 +162,33 @@ public class DashboardView extends VerticalLayout {
         kembalianText.setText("Kembalian: Rp " + kembali);
 
         try {
-            // Process the transaction using PurchaseTransaction
-            PurchaseTransaction trx = new PurchaseTransaction(cart, productService);
-            trx.processTransaction(); // Could throw custom exceptions like InsufficientStockException
+            String sellerUsername = userSession.getUser().getUsername();
+
+            PurchaseTransaction trx = new PurchaseTransaction(cart, productService, salesLogService, sellerUsername);
+            trx.processTransaction();
             trx.serializeTransaction();
+
+            String trxId = trx.getTransactionId();
+
+            for (CartItem item : cart) {
+                String detail = item.getProduct().getName() + " x" + item.getQuantity()
+                        + " @ Rp " + item.getProduct().getPrice()
+                        + " = Rp " + item.getSubtotal();
+                transactionItemLogService.logTransactionItem(trxId, sellerUsername, "ITEM_DETAIL", detail);
+            }
+
+            transactionModificationLogService.log(trxId, sellerUsername, "TRANSACTION_COMPLETED", "-");
 
             cart.clear();
             refreshCart();
 
-            Notification.show("Transaksi berhasil dengan ID: " + trx.getTransactionId());
+            Notification.show("Transaksi berhasil dengan ID: " + trxId);
 
         } catch (InsufficientStockException e) {
             Notification.show(e.getMessage());
         } catch (Exception e) {
             Notification.show("Terjadi kesalahan: " + e.getMessage());
-            e.printStackTrace(); // Optionally log the error for debugging
+            e.printStackTrace();
         }
     }
-
 }

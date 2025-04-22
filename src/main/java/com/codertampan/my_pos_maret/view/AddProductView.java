@@ -5,7 +5,9 @@ import com.codertampan.my_pos_maret.entity.NonPerishableProduct;
 import com.codertampan.my_pos_maret.entity.DigitalProduct;
 import com.codertampan.my_pos_maret.entity.BundleProduct;
 import com.codertampan.my_pos_maret.entity.Product;
+import com.codertampan.my_pos_maret.service.ProductLogService;
 import com.codertampan.my_pos_maret.service.ProductService;
+import com.codertampan.my_pos_maret.service.UserSession;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -28,6 +30,7 @@ import java.time.LocalDate;
 public class AddProductView extends VerticalLayout {
 
     private final ProductService productService;
+    private final UserSession userSession;
 
     private final TextField nameField = new TextField("Nama Produk");
     private final TextField codeField = new TextField("Kode Produk");
@@ -39,8 +42,9 @@ public class AddProductView extends VerticalLayout {
     private final ComboBox<String> typeField = new ComboBox<>("Tipe Produk");
 
     @Autowired
-    public AddProductView(ProductService productService) {
+    public AddProductView(ProductService productService, UserSession userSession) {
         this.productService = productService;
+        this.userSession = userSession;
 
         addClassName("add-product-view");
         setSpacing(true);
@@ -71,6 +75,9 @@ public class AddProductView extends VerticalLayout {
         add(saveButton);
     }
 
+    @Autowired
+    private ProductLogService productLogService;
+
     private void simpanProduk() {
         String name = nameField.getValue();
         String code = codeField.getValue();
@@ -80,14 +87,14 @@ public class AddProductView extends VerticalLayout {
         String tipe = typeField.getValue();
         String vendor = vendorField.getValue();
         String urls = urlField.getValue();
-    
+        
         if (name.isEmpty() || code.isEmpty() || price == null || stock == null || tipe == null) {
             Notification.show("Semua field harus diisi!");
             return;
         }
-    
+        
         Product product; // <- Ini deklarasi di luar blok if/else
-    
+        
         //"Perishable", "Non-Perishable", "Digital", "Bundle"
         if (tipe.equals("Perishable")) {
             if (expiryDate == null) {
@@ -123,11 +130,18 @@ public class AddProductView extends VerticalLayout {
             Notification.show("Tipe produk tidak dikenal!");
             return;
         }
-    
+        
         try {
+            // Simpan produk ke database
             productService.saveProduct(product);
+            
+            // Log produk yang baru ditambahkan
+            String sellerUsername = userSession.getUser().getUsername();
+            productLogService.logProductCreated(sellerUsername, code, name, price, stock.intValue());
+
+
             Notification.show("Produk berhasil disimpan!");
-    
+        
             // Reset fields
             nameField.clear();
             codeField.clear();
@@ -139,4 +153,5 @@ public class AddProductView extends VerticalLayout {
             Notification.show("Gagal menyimpan produk: " + e.getMessage());
         }
     }
+
 }

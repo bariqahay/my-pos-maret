@@ -92,4 +92,4 @@ public class ProductUpdateLog {
     public void setUpdateBatchId(UUID updateBatchId) {
         this.updateBatchId = updateBatchId;
     }
-}
+
