@@ -58,29 +58,29 @@ public class MainLayout extends AppLayout {
     private void createDrawer() {
         // Ambil user dari session
         User currentUser = userSession.getUser();
-
+    
         String usernameText = currentUser != null ? currentUser.getUsername() : "Guest";
         String roleText = currentUser != null ? currentUser.getRole().toString() : "Guest";
-
+    
         // Avatar, username, dan role
         Avatar avatar = new Avatar(usernameText);
         H4 username = new H4(usernameText);
         Span role = new Span(roleText);
-
+    
         username.getStyle().set("margin", "0");
         role.getStyle().set("font-size", "0.85rem").set("color", "gray");
-
+    
         VerticalLayout userInfo = new VerticalLayout(avatar, username, role);
         userInfo.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         userInfo.setPadding(false);
         userInfo.setSpacing(false);
         userInfo.getStyle().set("padding", "1rem 0");
-
+    
         // Layout menu
         VerticalLayout menuLayout = new VerticalLayout();
         menuLayout.setPadding(true);
         menuLayout.setSpacing(false);
-
+    
         // Semua user bisa lihat Dashboard
         RouterLink dashboardLink = new RouterLink("🏠 Dashboard", DashboardView.class);
         dashboardLink.getStyle()
@@ -89,7 +89,7 @@ public class MainLayout extends AppLayout {
             .set("padding", "0.75rem 1rem")
             .set("border-radius", "8px");
         menuLayout.add(dashboardLink);
-
+    
         // Jika user adalah ADMIN, tampilkan link tambahan
         if (currentUser != null && "ADMIN".equalsIgnoreCase(currentUser.getRole().toString())) {
             RouterLink productListLink = new RouterLink("📦 Product List", ProductListView.class);
@@ -98,17 +98,26 @@ public class MainLayout extends AppLayout {
                 .set("color", "#333")
                 .set("padding", "0.75rem 1rem")
                 .set("border-radius", "8px");
-
+            menuLayout.add(productListLink);
+    
             RouterLink userManagementLink = new RouterLink("👥 Manajemen User", AdminUserManagementView.class);
             userManagementLink.getStyle()
                 .set("text-decoration", "none")
                 .set("color", "#333")
                 .set("padding", "0.75rem 1rem")
                 .set("border-radius", "8px");
-
-            menuLayout.add(productListLink, userManagementLink);
+            menuLayout.add(userManagementLink);
+    
+            // Tombol untuk lihat log
+            RouterLink logLink = new RouterLink("🔍 Lihat Log", LogView.class);
+            logLink.getStyle()
+                .set("text-decoration", "none")
+                .set("color", "#333")
+                .set("padding", "0.75rem 1rem")
+                .set("border-radius", "8px");
+            menuLayout.add(logLink);
         }
-
+    
         // Tombol logout
         Button logoutButton = new Button("Logout", e -> logout());
         logoutButton.getStyle()
@@ -117,13 +126,13 @@ public class MainLayout extends AppLayout {
             .set("padding", "0.75rem 1rem")
             .set("border-radius", "8px");
         menuLayout.add(logoutButton);
-
+    
         // Layout drawer
         VerticalLayout drawerContent = new VerticalLayout(userInfo, menuLayout);
         drawerContent.setPadding(false);
         drawerContent.setSpacing(false);
         drawerContent.getStyle().set("background-color", "#f7f7f7");
-
+    
         addToDrawer(drawerContent);
     }
 

@@ -21,6 +21,11 @@ public class TransactionModificationLog {
 
     private LocalDateTime timestamp;
 
+    // Default constructor needed for Hibernate
+    public TransactionModificationLog() {
+    }
+
+    // Parameterized constructor
     public TransactionModificationLog(String transactionId, String username, String actionType, String detail, LocalDateTime timestamp) {
         this.transactionId = transactionId;
         this.username = username;
